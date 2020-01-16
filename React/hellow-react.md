@@ -1,0 +1,36 @@
+# React.js 基本环境安装
+
+## 安装 React.js
+
+在安装之前要确认你的机器上安装了 node.js 环境包括 npm,安装好环境以后，只需要按照官网的指引安装 `create-react-app` 即可。
+
+> npm install -g create-react-app
+
+这条命令会往我们的机器上安装一条叫 create-react-app 的命令，安装好以后就可以直接使用它来构建一个 react 的前端工程：
+
+> create-react-app hello-react
+
+这条命令会帮我们构建一个叫 hello-react 的工程，并且会自动地帮助我们安装所需要的依赖，只需要安静地等待它安装完。
+
+下载完以后我们就可以启动工程了，进入工程目录然后通过 npm 启动工程：
+
+```
+cd hello-react
+npm start
+```
+
+终端提示成功：
+
+![](./img/hellow-react-提示成功.png)
+
+运行的效果
+
+![](./img/hellow-react-运行的效果.png)
+
+把 `src/App.js` 文件中的 `<h2>` 标签的内容修改为 `Hello React`，
+
+```html
+<h2>Hello React</h2>
+```
+
+![React.js 安装教程图片](./img/hellow-react-修改生效.png)

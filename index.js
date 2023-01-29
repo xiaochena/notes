@@ -54,7 +54,7 @@ function getMdLine(dir, title) {
     }
     if (item.type === "file") {
       const path = item.path.replace(/\s/g, "%20");
-      title = `[${item.name}](${path})`;
+      title = `[${item.name}](\\${path})`;
       h = `-`;
     }
     const line = `${h} ${title}`;

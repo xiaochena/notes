@@ -1,17 +1,11 @@
 const fs = require("fs");
 const path = require("path");
-const max = 9999;
-let index = 0;
 
 function getDirectoryMap(dir) {
   /** @type {{path:String,name:String,depth:String,type:"directory"|"file"}[]} */
   const result = [];
 
   const getDirectory = (dir, depth = 1) => {
-    index += 1;
-    if (max < index) {
-      throw new Error();
-    }
     // 获取路径下使用文件夹和文件名称
     const filesList = fs.readdirSync(dir);
     for (let index = 0; index < filesList.length; index++) {

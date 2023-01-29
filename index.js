@@ -18,7 +18,7 @@ function getDirectoryMap(dir) {
         isDirectory &&
         ["img", "images"].some((item) => file.includes(item))
       ) {
-        break;
+        continue;
       }
 
       const resultItem = {
@@ -39,27 +39,34 @@ function getDirectoryMap(dir) {
 }
 
 //-------------------------------------------------
-const dir = path.join("./笔记");
-const result = getDirectoryMap(dir);
-const content = [];
+function getMdLine(dir, title) {
+  dir = path.join(dir);
+  const result = getDirectoryMap(dir);
+  const content = [`# ${title}`];
 
-for (let index = 0; index < result.length; index++) {
-  const item = result[index];
-  const depth = parseInt(item.depth);
-  let h = "".padStart(depth + 1, "#");
-  let title = "";
-  if (item.type === "directory") {
-    title = item.name;
+  for (let index = 0; index < result.length; index++) {
+    const item = result[index];
+    const depth = parseInt(item.depth);
+    let h = "".padStart(depth + 1, "#");
+    let title = "";
+    if (item.type === "directory") {
+      title = item.name;
+    }
+    if (item.type === "file") {
+      const path = item.path.replace(/\s/g, "%20");
+      title = `[${item.name}](${path})`;
+      h = `-`;
+    }
+    const line = `${h} ${title}`;
+    content.push(line);
   }
-  if (item.type === "file") {
-    const path = item.path.replace(/\s/g, "%20C");
-    title = `[${item.name}](${path})`;
-    h = `- ${h}`;
-  }
-  const line = `${h} ${title}`;
-  content.push(line);
+
+  return content;
 }
+const content1 = getMdLine("./工作日志", "工作日志");
+const content2 = getMdLine("./笔记", "笔记");
 
+const content = [...content1, ...content2];
 const strContent = content.join("\n");
 fs.writeFile("./README.md", strContent, () => {});
 

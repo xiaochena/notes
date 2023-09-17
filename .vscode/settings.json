@@ -4,5 +4,7 @@
   "pasteImage.basePath": "${projectRoot}",
   "pasteImage.prefix": "/",
   "pasteImage.insertPattern": "![${imageFileNameWithoutExt}](${imageFilePath})",
-  "pasteImage.showFilePathConfirmInputBox": false
+  "pasteImage.showFilePathConfirmInputBox": false,
+  "markdown.extension.print.includeVscodeStylesheets": true,
+  "markdown-preview-github-styles.colorTheme": "light"
 }

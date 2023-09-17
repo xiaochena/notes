@@ -93,7 +93,7 @@ docker.io/library/mysql:latest
 ```sh
 $ docker rmi -f 镜像id  # 删除指定镜像
 $ docker rmi -f 镜像id 镜像id 镜像id # 删除多个容器
-$ docker rmi -f docker rmi -f $(docker image -aq) # 删除全部的镜像
+$ docker rmi -f $(docker image ls -aq) # 删除全部的镜像
 ```
 
 ### 容器命令
@@ -142,18 +142,102 @@ $ docker ps # 列出正在运行的容器
 
 ```sh
 $ docker rm 容器id					# 删除指定的容器（不能删除正在运行的容器）
-$ docker rm -f $(docker ps -aq)	 	# 删除所有的容器
+$ docker rm -f $(docker ps -aq)	 	# 删除所有的容器 ,-f 强制删除
 $ docker ps -a -q|xargs docker rm	# 删除所有的容器
 ```
 
 启动和停止容器的操作`start`，`restart`，`stop`，`kill`
 
 ``` sh
-$ docker start 容器id		# 启动容器
-$ docker restart 容器id	# 重启容器
-$ docker stop 容器id		# 停止当前正在运行的容器
-$ docker kill 容器id		# 强制停止当前容器
+$ docker start 容器id     # 启动容器
+$ docker restart 容器id   # 重启容器
+$ docker stop 容器id      # 停止当前正在运行的容器
+$ docker kill 容器id      # 强制停止当前容器
 ```
 
-### 常用其他命令
+# 常用其他命令
+
+## 后台启动容器
+```sh
+docker run -d centos
+
+# 问题 docker ps，发现 centos 停止了
+# 原因：docker 容器使用后台运行，就必须要有一个前台进程，否则 docker 发现没有应用，就会自动停止
+```
+
+## 查看日志
+
+```sh
+# 运行centos并且执行一段 shell 脚本
+docker run -d centos /bin/sh -c "while true;do echo xiaochena;sleep 1;done"
+```
+```sh
+# 
+docker logs -tf -n 10 0207d2c3f2df
+# -tf 显示日志
+# -n(--tail) [:number] 要显示日志条数
+```
+
+## 查看容器中进程信息 ps
+```sh
+docker top 0207d2c3f2df
+
+# 以下信息省略一部分
+UID     PID     PPID    C   STIME          
+root    2711    2690    0   16:22          
+root    3002    2711    0   16:26          
+```
+
+## 查看容器信息
+
+```sh
+# docker inspect [:容器id]
+docker inspect 0207d2c3f2df
+```
+
+## 进入当前正在运行的容器
+
+- 方式一
+
+```sh
+# 我们通常容器都是使用后台方式运行的 ，有时需要进入容器，修改一些配置
+
+# 命令
+docker exec -it [:容器id] /bin/bash
+```
+
+- 方式二
+
+```sh
+docker attach [:容器id]
+```
+
+> 区别
+>
+> - docker exec ：进入容器后开启一个新的终端，可以在里面操作
+> - docker attach：进入容器正在执行的终端，不会启动新的进程
+
+#### 从容器内拷贝文件到主机上
+
+```sh
+# 启动一个容器
+docker run -it centos /bin/bash
+# 进入 home
+[root@fdd5948973c6 /]# cd home
+[root@fdd5948973c6 home]# ls
+# 创建一个文件
+[root@fdd5948973c6 home]# touch hello.text
+[root@fdd5948973c6 home]# ls
+hello.text
+# 推出容器
+[root@fdd5948973c6 home]# exit
+# 查看全部容器找到刚才在home创建了hello.text的容器的id
+docker ps -a
+# 拷贝到本机
+docker cp fdd5948973c6:/home/hello.text ./
+```
+
+> 上述的拷贝操作是一个手动的过程、还可以使用 `-v` 卷的技术、实现docker中文件和本机同步的能力
+
+
 

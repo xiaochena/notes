@@ -1,0 +1,8 @@
+{
+  "pasteImage.path": "${projectRoot}/attachments",
+  "pasteImage.defaultName": "${currentFileNameWithoutExt}-Y-MM-DD-HH-mm-ss",
+  "pasteImage.basePath": "${projectRoot}",
+  "pasteImage.prefix": "/",
+  "pasteImage.insertPattern": "![${imageFileNameWithoutExt}](${imageFilePath})",
+  "pasteImage.showFilePathConfirmInputBox": false
+}

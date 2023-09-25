@@ -17,7 +17,6 @@ $ docker i
 ```
 
 
-
 ### 镜像命令
 
 `docker images` 查看所有本地的主机上的镜像

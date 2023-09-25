@@ -163,4 +163,4 @@ export default Todo;
 
 ```
 
-<img src="C:\Users\小陈啊\Desktop\notes\学习\images\redux-1.png" style="zoom: 50%;" />
+![redux-demo-2023-09-24-22-53-39](/attachments/redux-demo-2023-09-24-22-53-39.png)

@@ -12,7 +12,7 @@
 |--bin
 |--laya	
 |--|--assets
-|--|--pages
+|--|--pages![Laya 2D 小游戏开发记录-2023-10-05-11-04-59](/attachments/Laya%202D%20小游戏开发记录-2023-10-05-11-04-59.png)
 |--|--.laya
 |--libs	
 |--src	

@@ -46,11 +46,11 @@ async Download() {
 
 后端返回二进制文件流时，比如获取后端返回的 excel 表格，前端一般接到的是一堆乱码数据
 
-<img src=".\images\2020-08-18-body.png" alt="image-20200822143052114" style="zoom:80%;" />
+![基于umi-request的下载、打印excel表格(Post请求)-2023-10-05-11-00-10](/attachments/基于umi-request的下载、打印excel表格(Post请求)-2023-10-05-11-00-10.png)
 
 而设置了`responseType: "blob"`之后通过打印`console.log(res, "res");`可以发现获取的 res 为一个 blob 对象
 
-![image-20200825170138389](.\images\2020-08-18-resBlob.jpg)
+![基于umi-request的下载、打印excel表格(Post请求)-2023-10-05-11-00-25](/attachments/基于umi-request的下载、打印excel表格(Post请求)-2023-10-05-11-00-25.png)
 
 完整的下载按钮调用下载接口为：
 
@@ -94,7 +94,7 @@ async Download() {
 
 1. 查看调用接口返回的信息: 发现后端将文件名存在了`content-disposition`中
 
-<img src=".\images\2020-08-18-contentDisposition.png" alt="image-20200822142739743" style="zoom:80%;" />
+![基于umi-request的下载、打印excel表格(Post请求)-2023-10-05-11-00-39](/attachments/基于umi-request的下载、打印excel表格(Post请求)-2023-10-05-11-00-39.png)
 
 这里要注意一下，虽然我们在浏览器中看得到，但是我们并不能拿到这个请求头
 
@@ -165,7 +165,7 @@ async Download() {
 
 > （也可能是我姿势不对(￣ ε(#￣)）
 
-![image-20200826112404019](.\images\2020-08-18-elsxBinary.jpg)
+![基于umi-request的下载、打印excel表格(Post请求)-2023-10-05-11-00-49](/attachments/基于umi-request的下载、打印excel表格(Post请求)-2023-10-05-11-00-49.png)
 
 别慌，我们设置`umi-request`响应拦截，处理获得的数据并且获取请求头
 
@@ -183,7 +183,7 @@ request.interceptors.response.use(async (response) => {
 
 这样子在`console.log(response, "response");`中打印的数据被我处理为：
 
-![image-20200825175506534](.\images\2020-08-18-fileName.png)
+![基于umi-request的下载、打印excel表格(Post请求)-2023-10-05-11-00-57](/attachments/基于umi-request的下载、打印excel表格(Post请求)-2023-10-05-11-00-57.png)
 
 这样我们即获取了 excel 的 blob 对象，同时也获取了`content-disposition`中的文件名
 

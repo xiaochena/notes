@@ -10,14 +10,14 @@ $ docker 命令 --help	# 帮助命令
 
 帮助文档的地址：https://docs.docker.com/reference/
 
-## 基础命令
+# 基础命令
 
 ```shell
 $ docker i
 ```
 
 
-### 镜像命令
+## 镜像命令
 
 `docker images` 查看所有本地的主机上的镜像
 
@@ -95,7 +95,7 @@ $ docker rmi -f 镜像id 镜像id 镜像id # 删除多个容器
 $ docker rmi -f $(docker image ls -aq) # 删除全部的镜像
 ```
 
-### 容器命令
+## 容器命令
 
 有镜像才可以创建容器、使用centos镜像学习
 
@@ -211,14 +211,13 @@ docker exec -it [:容器id] /bin/bash
 docker attach [:容器id]
 ```
 
-> 区别
->
-> - docker exec ：进入容器后开启一个新的终端，可以在里面操作
-> - docker attach：进入容器正在执行的终端，不会启动新的进程
+### 区别
+- docker exec ：进入容器后开启一个新的终端，可以在里面操作
+- docker attach：进入容器正在执行的终端，不会启动新的进程
 
-#### 从容器内拷贝文件到主机上
-
-```sh
+## 从容器内拷贝文件到主机上
+**docker cp [:容器id]:[容器内路径] [主机路径]**
+```shell
 # 启动一个容器
 docker run -it centos /bin/bash
 # 进入 home
@@ -231,12 +230,67 @@ hello.text
 # 推出容器
 [root@fdd5948973c6 home]# exit
 # 查看全部容器找到刚才在home创建了hello.text的容器的id
-docker ps -a
+$ docker ps -a
+CONTAINER ID   IMAGE     COMMAND
+0ceb2c4849d8   centos    "/bin/bash"
 # 拷贝到本机
-docker cp fdd5948973c6:/home/hello.text ./
+$ docker cp 0ceb2c4849d8:/home/hello.text ./
+```
+上述的拷贝操作是一个手动的过程、还可以使用 `-v` 卷的技术、实现docker中文件和本机同步的能力
+
+## commit 镜像
+
+`docker commit` 提交容器成为一个新的副本
+
+docker commit -m="提交的描述信息" -a="作者" 容器id[:id] 目标镜像名称[:tag]
+
+> 目标镜像名称[:tag] 必须是英文 如果不指定，默认是latest
+
+
+```shell
+# 启动一个容器
+docker run -it centos /bin/bash
+# 进入 home
+[root@fdd5948973c6 /]# cd home
+[root@fdd5948973c6 home]# ls
+# 创建一个文件
+[root@fdd5948973c6 home]# touch hello.text
+[root@fdd5948973c6 home]# ls
+hello.text
+# 推出容器
+[root@fdd5948973c6 home]# exit
+# 查看全部容器找到刚才在home创建了hello.text的容器的id
+$ docker ps -a
+CONTAINER ID   IMAGE     COMMAND
+c18fff6a893c   centos    "/bin/bash"
+# 提交镜像
+$ docker commit -m="我用于测试的docker镜像" -a="xiaochen" c18fff6a893c centos_xc:1.0
+sha256:6aa7014138c69c7f17bd32b9def1034ad4af2b2ffeea649d8d2f8742650abe62
+
+$ docker images
+REPOSITORY   TAG       IMAGE ID       CREATED              SIZE
+centos_xc    1.0       6aa7014138c6   About a minute ago   231MB
+
+# 启动新的镜像
+$ docker run -it centos_xc:1.0 /bin/bash
+[root@0622e8e4d0fe /]# cd home/
+[root@0622e8e4d0fe home]# ls
+hello.text
 ```
 
-> 上述的拷贝操作是一个手动的过程、还可以使用 `-v` 卷的技术、实现docker中文件和本机同步的能力
+## 容器数据卷
+**容器数据卷（Container Volumes）是用于在容器中持久存储数据的一种机制。** 它们允许容器在不受容器的生命周期限制的情况下读写数据。这对于存储应用程序数据、配置文件、日志文件等非易失性数据非常有用。
 
+- 持久性存储：容器数据卷中存储的数据可以在容器之间共享和保留，即使容器被停止、删除或重新创建，数据仍然存在。
 
+- 数据共享：多个容器可以访问同一个容器数据卷，这有助于实现容器之间的数据共享和协作。
 
+- 数据卷的生命周期独立于容器：容器数据卷的生命周期不依赖于容器的生命周期。这意味着容器可以被删除，而数据卷仍然存在，可以供新容器使用。
+
+- 数据卷类型：容器数据卷可以使用不同的后端存储技术实现，例如本地主机文件系统、网络存储（NFS、CIFS等）、云存储（如AWS EBS、Azure Disk）等。
+
+- 数据卷挂载：在容器内，数据卷通过挂载到容器的指定路径来使用。容器可以读取和写入数据卷上的文件。
+
+容器数据卷使得容器化应用程序更加灵活和可移植，因为它们使数据持久化和可访问，无论容器在何处运行。这对于数据库容器、应用程序配置、日志文件和共享资源等方面非常有用。
+
+如MySQL（或任何其他数据库系统）通常**需要持久存储数据在本地**，以便数据在容器重新启动或迁移时不会丢失。

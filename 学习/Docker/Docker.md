@@ -294,3 +294,131 @@ hello.text
 容器数据卷使得容器化应用程序更加灵活和可移植，因为它们使数据持久化和可访问，无论容器在何处运行。这对于数据库容器、应用程序配置、日志文件和共享资源等方面非常有用。
 
 如MySQL（或任何其他数据库系统）通常**需要持久存储数据在本地**，以便数据在容器重新启动或迁移时不会丢失。
+
+使用容器数据卷:
+- 使用指定路径挂载
+```shell
+# 创建一个容器并且挂载一个数据卷
+$ docker run -it -v /home/ceshi:/home centos /bin/bash
+# docker run -it -v /主机绝对路径:/容器内路径 镜像名称[:tag] /bin/bash
+[root@5e6fbaee6d6d /]# exit
+exit
+# 查看挂载的容器id
+docker ps -a
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS                      PORTS     NAMES
+5e6fbaee6d6d   centos    "/bin/bash"              35 seconds ago   Exited (0) 30 seconds ago             serene_nobel
+# 查看挂载的容器详细信息
+$ docker inspect 5e6fbaee6d6d
+#...
+    "Mounts": [
+             {
+                 "Type": "bind",
+                 "Source": "/home/ceshi", # 挂载的主机路径
+                 "Destination": "/home",  # 挂载的容器内路径
+                 "Mode": "",
+                 "RW": true,
+                 "Propagation": "rprivate"
+             }
+         ],
+#...
+$ cd /home/ceshi/
+$ touch hello.text # 权限不够的话用 sudo touch hello.text
+$ ls
+hel&lo.text
+# 进入容器查看
+$ docker start 5e6fbaee6d6d
+$ docker attach 5e6fbaee6d6d
+[root@5e6fbaee6d6d /]# cd home/
+[root@5e6fbaee6d6d home]# ls
+hello.text
+[root@5e6fbaee6d6d home]#
+```
+
+- 具命挂载和匿名挂载
+
+```shell
+# 具名挂载
+$ docker run -it -v cs-home:/home centos /bin/bash
+$ docker volume ls
+DRIVER    VOLUME NAME
+local     cs-home
+---------------------------------------------------
+# 匿名挂载
+$ docker run -it -v /home/ceshi centos /bin/bash
+$ docker volume ls
+DRIVER    VOLUME NAME
+local     984e9dad6ba58ea35f5c827cc44d6bca538b949d887ad8777dc03e8e69269944
+
+---------------------------------------------------
+# 查看挂载的详细信息
+$ docker volume inspect  cs-home
+[
+    {
+        "CreatedAt": "2023-10-05T11:59:16Z",
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker/volumes/cs-home/_data", # 挂载的主机路径
+        "Name": "cs-home",
+        "Options": null,
+        "Scope": "local"
+    }
+]
+```
+- 扩展
+  通过使用 ro rw 指定挂载的权限
+```shell 
+# ro 只读
+$ docker run -it -v cs-home:/home:ro centos /bin/bash
+# rw 读写
+$ docker run -it -v cs-home:/home:rw centos /bin/bash
+```
+
+## 初识Dockerfile
+Dockerfile是用于构建Docker镜像的文本文件。Dockerfile中的指令可以用于指定基础镜像、安装软件包、复制文件、设置环境变量、运行命令等。通过编写Dockerfile，可以定义一个自定义的镜像，其中包含了应用程序所需的所有组件和配置。这样，其他用户可以使用该Dockerfile来构建相同的镜像，并在其本地或其他环境中运行应用程序。
+
+```dockerfile
+FROM nginx:latest
+
+RUN echo "Hello Dockerfile" > /usr/share/nginx/html/index.html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+```shell
+# 构建镜像
+$ docker build -f dockerfile1 -t cs_nginx .
+# 查看镜像
+$ docker images
+REPOSITORY   TAG       IMAGE ID       CREATED         SIZE
+cs_nginx     latest    015e08fb510e   2 minutes ago   187MB
+# 运行镜像
+$ docker run -d -p 10086:80 cs_nginx
+```
+- `docker build`: 这是Docker命令，用于构建Docker镜像。
+- `-f dockerfile1`: 这是用于指定要使用的Dockerfile的选项。在这种情况下，Docker将使用名为 `dockerfile1` 的文件作为构建镜像的配置文件。
+- `-t cs_nginx`: 这是用于为构建的镜像指定一个标签（tag）。在这里，镜像将被标记为 `cs_nginx`，以便以后可以通过这个标签来引用它。
+- `.`: 这表示Docker将在当前目录中查找Dockerfile和构建上下文。Docker将使用当前目录作为构建上下文，并将其中的文件复制到镜像中。
+运行镜像后
+![Docker-2023-10-05-21-06-58](/attachments/Docker-2023-10-05-21-06-58.png)
+
+### dockerfile 指令
+- FROM：指定基础镜像。一切从这里开始构建
+- MAINTAINER：指定镜像创建者信息（姓名 + 邮箱）
+- RUN: 在镜像构建过程中执行的命令。例如安装一个软件包，或执行一些需要长时间运行的编译操作。如 `npm install`
+- ADD: 将主机目录下的文件复制到镜像中，如果是压缩包会自动解压
+- WORKDIR：为后续的`RUN`、`CMD`、`ENTRYPOINT`指令配置工作目录
+- VOLUME：创建一个可以从本地主机或其他容器挂载的挂载点，一般用来存放数据库和需要保持的数据等
+- EXPOSE：声明容器运行时的监听端口，但是不会自动在宿主主机上打开这个端口的链接，需要使用-P或者-p来指定
+- CMD: 指定一个容器启动时要运行的命令，**Dockerfile中可以有多个CMD指令，但只有最后一个生效**，CMD会被docker run之后的参数替换
+- ENTRYPOINT：指定一个容器启动时要运行的命令，**Dockerfile中可以有多个ENTRYPOINT指令，但只有最后一个生效**，ENTRYPOINT不会被docker run之后的参数替换，**ENTRYPOINT 指令可以追加指令。** 
+  ```
+  FROM ubuntu
+  ENTRYPOINT ["echo", "Hello"]
+  CMD ["World"]
+  ```
+  容器启动时将执行 echo "Hello" "World" 命令。
+- ONBUILD：当构建一个被继承Dockerfile时运行命令，父镜像在被子继承后父镜像的onbuild被触发
+- COPY: 类似ADD，将主机目录下的文件复制到镜像中，但是不会自动解压文件，**由于 ADD 指令的自动解压缩和下载功能，它的使用相对较少，并且在某些情况下可能会导致不可预期的行为。** 因此，通常建议在大多数情况下使用 COPY 指令，并在需要特定功能（如解压缩或下载）时才使用 ADD 指令。
+- ENV: 设置环境变量，可以在后续的指令中使用这个环境变量

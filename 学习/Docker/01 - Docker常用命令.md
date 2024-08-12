@@ -57,7 +57,7 @@ centos/mysql-57-centos7           MySQL 5.7 SQL database server                 
 ### docker pull - 拉取镜像
 
 ```shell
-# 下载镜像 docker pull 镜像名称[:tag]
+# 下载镜像 docker pull 镜像名称[tag]
 $ docker pull mysql
 Using default tag: latest    # 如果不写tag，默认选择latest 最新版本
 latest: Pulling from library/mysql
@@ -78,9 +78,9 @@ Status: Downloaded newer image for mysql:latest # 真实版本
 docker.io/library/mysql:latest
 ```
 
-### docker rmi -f [:id] - 删除镜像
+### docker rmi -f [id] - 删除镜像
 
-```sh
+```shell
 docker rmi -f 镜像id  # 删除指定镜像
 docker rmi -f 镜像id 镜像id 镜像id # 删除多个容器
 docker rmi -f $(docker image ls -aq) # 删除全部的镜像
@@ -90,22 +90,23 @@ docker rmi -f $(docker image ls -aq) # 删除全部的镜像
 
 有镜像才可以创建容器、使用 centos 镜像学习
 
-```sh
+```shell
 docker pull centos
 ```
 
 ### docker run - 创建容器并启动
 
-```sh
-$ docker run [可选参数] image
+```shell
+$ docker run [可选参数] 镜像名称
 # 参数说明
 --name="Name" # 容器名字 nginx01 nginx02,用来区分容器
--d    # 后台方式运行
--it    # 使用交互方式运行、进入容器查看内容
--p    # 1、ip:主机端口:容器端口
-    # 2、主机端口:容器端口（常用）
-    # 3、容器端口
--P    # 随机端口
+-d      # 后台方式运行
+-it     # 使用交互方式运行、进入容器查看内容
+-p      # 1、ip:主机端口:容器端口
+        # 2、主机端口:容器端口（常用）
+        # 3、容器端口
+-P      # 随机端口
+--rm    # 退出时自动删除容器
 
 #测试，启动并进入容器、exit退出
 $ docker run -it centos /bin/bash
@@ -117,9 +118,17 @@ exit
 
 `exit`退出容器会停止、使用`Ctrl +P +Q`容器不停止退出
 
+通常直接执行 `docker run` 会自动拉取镜像（如果本地不存在的话）
+
+`--rm` - 这个选项在容器停止时自动删除容器。它有助于清理容器，避免占用不必要的磁盘空间。特别适合测试和临时性任务。
+
+```shell
+docker run -it --rm centos /bin/bash
+```
+
 ### docker ps - 查看运行的容器
 
-```sh
+```shell
 $ docker ps # 列出正在运行的容器
 
 # 参数
@@ -138,7 +147,7 @@ exit # 退出并停止容器
 
 ### docker rm - 删除容器
 
-```sh
+```shell
 docker rm 容器id     # 删除指定的容器（不能删除正在运行的容器）
 docker rm -f $(docker ps -aq)   # 删除所有的容器 ,-f 强制删除
 docker ps -a -q|xargs docker rm # 删除所有的容器
@@ -146,7 +155,7 @@ docker ps -a -q|xargs docker rm # 删除所有的容器
 
 启动和停止容器的操作`start`，`restart`，`stop`，`kill`
 
-```sh
+```shell
 docker start 容器id     # 启动容器
 docker restart 容器id   # 重启容器
 docker stop 容器id      # 停止当前正在运行的容器
@@ -157,14 +166,14 @@ docker kill 容器id      # 强制停止当前容器
 
 ### docker logs 查看日志
 
-```sh
+```shell
 # 运行 centos并且执行一段 shell 脚本 模拟日志打印
 docker run -d centos /bin/sh -c "while true;do echo xiaochena;sleep 1;done"
 ```
 
 查看日志
 
-```sh
+```shell
 #
 docker logs -tf -n 10 0207d2c3f2df
 # -tf 显示日志
@@ -173,7 +182,7 @@ docker logs -tf -n 10 0207d2c3f2df
 
 ### docker top - 查看容器中进程信息
 
-```sh
+```shell
 docker top 0207d2c3f2df
 
 # 以下信息省略一部分
@@ -184,7 +193,7 @@ root    3002    2711    0   16:26
 
 ### docker inspect - 查看容器信息
 
-```sh
+```shell
 # docker inspect [:容器id]
 docker inspect 0207d2c3f2df
 ```
@@ -195,13 +204,13 @@ docker inspect 0207d2c3f2df
 
 - 方式一
 
-```sh
+```shell
 docker exec -it [容器id] /bin/bash
 ```
 
 - 方式二
 
-```sh
+```shell
 docker attach [容器id]
 ```
 

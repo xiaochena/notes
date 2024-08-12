@@ -1,0 +1,14 @@
+{
+  "name": "express-demo",
+  "version": "1.0.0",
+  "description": "A simple Express.js application",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
